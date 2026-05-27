@@ -47,17 +47,24 @@ export default function MemoCard({ memo, onUpdate, onRemove, onToggle }: Props) 
       dirRef.current = Math.abs(dx) >= Math.abs(dy) ? 'h' : 'v';
     }
     if (dirRef.current !== 'h') return;
+    e.stopPropagation();
+    setIsSwiping(true);
     if (dx > 0) {
-      e.stopPropagation();
-      setIsSwiping(true);
       setSlideX(Math.min(100, dx));
+    } else {
+      setSlideX(Math.max(-100, dx));
     }
   };
 
   const onTouchEnd = (e: React.TouchEvent) => {
     if (isSwiping) {
       e.stopPropagation();
-      if (slideX >= SWIPE_THRESHOLD) onToggle(memo.id);
+      if (slideX >= SWIPE_THRESHOLD) {
+        onToggle(memo.id);
+      } else if (slideX <= -SWIPE_THRESHOLD) {
+        onRemove(memo.id);
+        return;
+      }
     }
     setSlideX(0);
     setIsSwiping(false);
@@ -75,6 +82,7 @@ export default function MemoCard({ memo, onUpdate, onRemove, onToggle }: Props) 
   };
 
   const showHint = slideX > 20;
+  const showDeleteHint = slideX < -20;
 
   return (
     <div
@@ -84,7 +92,7 @@ export default function MemoCard({ memo, onUpdate, onRemove, onToggle }: Props) 
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
-      {/* スワイプ背景アクション */}
+      {/* 右スワイプ背景（完了トグル） */}
       <div
         style={{
           position: 'absolute',
@@ -116,6 +124,40 @@ export default function MemoCard({ memo, onUpdate, onRemove, onToggle }: Props) 
               <path d="M2 6.5l3 3 5-6" stroke="#4caf50" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           )}
+        </div>
+      </div>
+
+      {/* 左スワイプ背景（削除） */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          paddingRight: '18px',
+          opacity: showDeleteHint ? 1 : 0,
+          transition: 'opacity 0.15s',
+        }}
+      >
+        <div
+          style={{
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            background: '#ffeaea',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          {/* ゴミ箱アイコン */}
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+            <path d="M10 11v6M14 11v6" />
+            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+          </svg>
         </div>
       </div>
 

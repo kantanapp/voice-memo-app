@@ -14,9 +14,17 @@ interface Props {
 export default function MemosView({ memos, onUpdate, onRemove, onToggle }: Props) {
   const [query, setQuery] = useState('');
 
-  const displayed = query
+  const filtered = query
     ? memos.filter((m) => m.text.toLowerCase().includes(query.toLowerCase()))
     : memos;
+
+  // 未完了（新しい順）→ 完了済み（新しい順）
+  const displayed = [...filtered].sort((a, b) => {
+    const aComp = a.completed ? 1 : 0;
+    const bComp = b.completed ? 1 : 0;
+    if (aComp !== bComp) return aComp - bComp;
+    return b.createdAt - a.createdAt;
+  });
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
