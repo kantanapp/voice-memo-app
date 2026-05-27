@@ -57,6 +57,16 @@ export function useMemos() {
     });
   }, []);
 
+  const toggle = useCallback((id: string) => {
+    setMemos((prev) => {
+      const next = prev.map((m) =>
+        m.id === id ? { ...m, completed: !m.completed, updatedAt: Date.now() } : m
+      );
+      persist(next);
+      return next;
+    });
+  }, []);
+
   const search = useCallback(
     (query: string): Memo[] => {
       if (!query.trim()) return memos;
@@ -66,5 +76,5 @@ export function useMemos() {
     [memos]
   );
 
-  return { memos, save, update, remove, search };
+  return { memos, save, update, remove, toggle, search };
 }

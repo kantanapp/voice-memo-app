@@ -3,4 +3,5 @@ export interface Memo {
   text: string;
   createdAt: number;
   updatedAt: number;
+  completed?: boolean;
 }

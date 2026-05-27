@@ -1,63 +1,23 @@
 'use client';
 
-import { useState } from 'react';
-import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
+import { useMemo } from 'react';
 import { useMemos } from '@/hooks/useMemos';
-import RecordButton from '@/components/RecordButton';
-import TranscriptDisplay from '@/components/TranscriptDisplay';
+import SwipeContainer from '@/components/SwipeContainer';
+import RecordView from '@/components/RecordView';
+import MemosView from '@/components/MemosView';
 
-export default function RecordPage() {
-  const { finalText, interimText, isRecording, isSupported, start, stop, reset } =
-    useSpeechRecognition();
-  const { save } = useMemos();
-  const [toast, setToast] = useState('');
+export default function Page() {
+  const { memos, save, update, remove, toggle } = useMemos();
 
-  const showToast = (msg: string) => {
-    setToast(msg);
-    setTimeout(() => setToast(''), 2000);
-  };
-
-  const handleToggle = () => {
-    if (isRecording) {
-      stop();
-      if (finalText.trim()) {
-        save(finalText.trim());
-        showToast('保存しました');
-      }
-      reset();
-    } else {
-      reset();
-      start();
-    }
-  };
-
-  return (
-    <div className="flex flex-col items-center justify-center min-h-full gap-8 px-6 py-10">
-      {!isSupported && (
-        <p className="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-xl px-4 py-3 text-center">
-          Chrome または Edge をご利用ください。このブラウザは音声認識に対応していません。
-        </p>
-      )}
-
-      <div className="w-full">
-        <TranscriptDisplay
-          finalText={finalText}
-          interimText={interimText}
-          isRecording={isRecording}
-        />
-      </div>
-
-      {isRecording && (
-        <p className="text-sm text-red-500 font-medium animate-pulse">録音中...</p>
-      )}
-
-      <RecordButton isRecording={isRecording} onToggle={handleToggle} disabled={!isSupported} />
-
-      {toast && (
-        <div className="fixed top-5 left-1/2 -translate-x-1/2 bg-green-500 text-white text-sm px-5 py-2 rounded-full shadow-lg">
-          {toast}
-        </div>
-      )}
-    </div>
+  // views の順番 = BottomNav のタブ順: [0=メモ一覧, 1=録音]
+  const views = useMemo(
+    () => [
+      <MemosView key="memos" memos={memos} onUpdate={update} onRemove={remove} onToggle={toggle} />,
+      <RecordView key="record" onSave={save} />,
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [memos]
   );
+
+  return <SwipeContainer views={views} defaultIndex={1} />;
 }
