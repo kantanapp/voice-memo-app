@@ -19,36 +19,44 @@ export default function MemoList({ memos, onUpdate, onRemove, onToggle }: Props)
     : memos;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="relative">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      {/* 検索バー */}
+      <div style={{ position: 'relative' }}>
         <svg
-          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+          style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#bbb' }}
+          width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"
-          />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
         </svg>
         <input
           type="search"
-          placeholder="メモを検索..."
+          placeholder="検索"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          style={{
+            width: '100%',
+            paddingLeft: '36px',
+            paddingRight: '16px',
+            paddingTop: '10px',
+            paddingBottom: '10px',
+            background: 'var(--input)',
+            border: 'none',
+            borderRadius: '12px',
+            fontSize: '14px',
+            color: 'var(--text-primary)',
+            outline: 'none',
+            fontFamily: 'inherit',
+          }}
         />
       </div>
 
+      {/* リスト */}
       {displayed.length === 0 ? (
-        <p className="text-center text-gray-400 text-sm py-12">
+        <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '14px', padding: '48px 0' }}>
           {query ? '検索結果がありません' : 'まだメモがありません'}
         </p>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {displayed.map((memo) => (
             <MemoCard
               key={memo.id}
