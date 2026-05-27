@@ -4,16 +4,19 @@ import { useState } from 'react';
 import { Memo } from '@/types/memo';
 import MemoCard from './MemoCard';
 
-interface MemoListProps {
+interface Props {
   memos: Memo[];
   onUpdate: (id: string, text: string) => void;
   onRemove: (id: string) => void;
-  search: (query: string) => Memo[];
+  onToggle: (id: string) => void;
 }
 
-export default function MemoList({ memos, onUpdate, onRemove, search }: MemoListProps) {
+export default function MemoList({ memos, onUpdate, onRemove, onToggle }: Props) {
   const [query, setQuery] = useState('');
-  const displayed = query ? search(query) : memos;
+
+  const displayed = query
+    ? memos.filter((m) => m.text.toLowerCase().includes(query.toLowerCase()))
+    : memos;
 
   return (
     <div className="flex flex-col gap-4">
@@ -52,6 +55,7 @@ export default function MemoList({ memos, onUpdate, onRemove, search }: MemoList
               memo={memo}
               onUpdate={onUpdate}
               onRemove={onRemove}
+              onToggle={onToggle}
             />
           ))}
         </div>
