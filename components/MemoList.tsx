@@ -9,9 +9,10 @@ interface Props {
   onUpdate: (id: string, text: string) => void;
   onRemove: (id: string) => void;
   onToggle: (id: string) => void;
+  onFavorite: (id: string) => void;
 }
 
-export default function MemoList({ memos, onUpdate, onRemove, onToggle }: Props) {
+export default function MemoList({ memos, onUpdate, onRemove, onToggle, onFavorite }: Props) {
   const [query, setQuery] = useState('');
 
   const displayed = query
@@ -64,6 +65,7 @@ export default function MemoList({ memos, onUpdate, onRemove, onToggle }: Props)
               onUpdate={onUpdate}
               onRemove={onRemove}
               onToggle={onToggle}
+              onFavorite={onFavorite}
             />
           ))}
         </div>

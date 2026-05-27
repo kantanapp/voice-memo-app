@@ -11,6 +11,7 @@ const SAMPLE_MEMOS: Memo[] = [
     text: '明日の朝、駅前のカフェで10時に打ち合わせ。資料を忘れずに持っていく。',
     createdAt: Date.now() - 1000 * 60 * 10,
     updatedAt: Date.now() - 1000 * 60 * 10,
+    favorited: true,
   },
   {
     id: 'sample-2',
@@ -24,6 +25,7 @@ const SAMPLE_MEMOS: Memo[] = [
     text: 'Aプロジェクトのデザイン修正。フォントサイズを少し大きくして余白を調整する。レスポンシブ対応も確認。',
     createdAt: Date.now() - 1000 * 60 * 60 * 3,
     updatedAt: Date.now() - 1000 * 60 * 60 * 3,
+    favorited: true,
   },
   {
     id: 'sample-4',
@@ -107,5 +109,25 @@ export function useMemos() {
     [memos]
   );
 
-  return { memos, save, update, remove, toggle, search };
+  // お気に入りトグル（最大2件）
+  const favorite = useCallback((id: string) => {
+    setMemos((prev) => {
+      const target = prev.find((m) => m.id === id);
+      if (!target) return prev;
+      // 解除はいつでもOK
+      if (target.favorited) {
+        const next = prev.map((m) => m.id === id ? { ...m, favorited: false } : m);
+        persist(next);
+        return next;
+      }
+      // 追加は2件未満のときのみ
+      const favCount = prev.filter((m) => m.favorited).length;
+      if (favCount >= 2) return prev;
+      const next = prev.map((m) => m.id === id ? { ...m, favorited: true } : m);
+      persist(next);
+      return next;
+    });
+  }, []);
+
+  return { memos, save, update, remove, toggle, favorite, search };
 }

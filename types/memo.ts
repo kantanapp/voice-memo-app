@@ -4,4 +4,5 @@ export interface Memo {
   createdAt: number;
   updatedAt: number;
   completed?: boolean;
+  favorited?: boolean;
 }

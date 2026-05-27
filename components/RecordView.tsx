@@ -3,15 +3,22 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
+import { Memo } from '@/types/memo';
 import RecordButton from './RecordButton';
 import TranscriptDisplay from './TranscriptDisplay';
 import WaveformBars from './WaveformBars';
+import MemoCard from './MemoCard';
 
 interface Props {
   onSave: (text: string) => void;
+  favoriteMemos: Memo[];
+  onUpdate: (id: string, text: string) => void;
+  onRemove: (id: string) => void;
+  onToggle: (id: string) => void;
+  onFavorite: (id: string) => void;
 }
 
-export default function RecordView({ onSave }: Props) {
+export default function RecordView({ onSave, favoriteMemos, onUpdate, onRemove, onToggle, onFavorite }: Props) {
   const { finalText, interimText, isRecording, isSupported, start, stop, reset } =
     useSpeechRecognition();
   const [toast, setToast] = useState('');
@@ -45,6 +52,25 @@ export default function RecordView({ onSave }: Props) {
           isRecording={isRecording}
         />
       </div>
+
+      {/* お気に入りメモ（最大2件）― 録音ボタンの上 */}
+      {favoriteMemos.length > 0 && (
+        <div style={{ marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <p style={{ fontSize: '11px', color: 'var(--text-muted)', letterSpacing: '0.06em', marginBottom: '2px' }}>
+            ★ お気に入り
+          </p>
+          {favoriteMemos.map((memo) => (
+            <MemoCard
+              key={memo.id}
+              memo={memo}
+              onUpdate={onUpdate}
+              onRemove={onRemove}
+              onToggle={onToggle}
+              onFavorite={onFavorite}
+            />
+          ))}
+        </div>
+      )}
 
       {/* コントロールエリア（固定高さで安定） */}
       <div className="flex flex-col items-center gap-4">
