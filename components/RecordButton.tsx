@@ -21,7 +21,7 @@ export default function RecordButton({ isRecording, onToggle, disabled }: Record
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: isRecording ? '#111' : '#f0f0f0',
+        background: isRecording ? '#ef4444' : '#f0f0f0',
         transform: isRecording ? 'scale(1.08)' : 'scale(1)',
         boxShadow: isRecording
           ? '0 0 0 8px rgba(0,0,0,0.06), 0 4px 20px rgba(0,0,0,0.18)'
@@ -33,7 +33,7 @@ export default function RecordButton({ isRecording, onToggle, disabled }: Record
       {isRecording ? (
         /* 停止アイコン (■) */
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <rect x="3" y="3" width="12" height="12" rx="2" fill="#ef4444" />
+          <rect x="3" y="3" width="12" height="12" rx="2" fill="#fff" />
         </svg>
       ) : (
         /* マイクアイコン */

@@ -56,7 +56,7 @@ export default function RecordView({ onSave }: Props) {
           style={{
             fontSize: '13px',
             fontWeight: isRecording ? 600 : 400,
-            color: isRecording ? 'var(--text-primary)' : 'var(--text-muted)',
+            color: isRecording ? '#ef4444' : 'var(--text-muted)',
             transition: 'color 0.3s',
             letterSpacing: isRecording ? '0.04em' : 0,
           }}
