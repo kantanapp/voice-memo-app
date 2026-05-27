@@ -9,9 +9,10 @@ interface Props {
   onUpdate: (id: string, text: string) => void;
   onRemove: (id: string) => void;
   onToggle: (id: string) => void;
+  onFavorite: (id: string) => void;
 }
 
-export default function MemosView({ memos, onUpdate, onRemove, onToggle }: Props) {
+export default function MemosView({ memos, onUpdate, onRemove, onToggle, onFavorite }: Props) {
   const [query, setQuery] = useState('');
 
   const filtered = query
@@ -43,6 +44,7 @@ export default function MemosView({ memos, onUpdate, onRemove, onToggle }: Props
                 onUpdate={onUpdate}
                 onRemove={onRemove}
                 onToggle={onToggle}
+                onFavorite={onFavorite}
               />
             ))}
           </div>

@@ -8,6 +8,7 @@ interface Props {
   onUpdate: (id: string, text: string) => void;
   onRemove: (id: string) => void;
   onToggle: (id: string) => void;
+  onFavorite: (id: string) => void;
 }
 
 const SWIPE_THRESHOLD = 60;
@@ -21,7 +22,7 @@ function formatDate(ts: number) {
   });
 }
 
-export default function MemoCard({ memo, onUpdate, onRemove, onToggle }: Props) {
+export default function MemoCard({ memo, onUpdate, onRemove, onToggle, onFavorite }: Props) {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(memo.text);
   const [slideX, setSlideX] = useState(0);
@@ -177,7 +178,17 @@ export default function MemoCard({ memo, onUpdate, onRemove, onToggle }: Props) 
             {formatDate(memo.createdAt)}
           </span>
           {!isEditing && (
-            <div style={{ display: 'flex', gap: '16px' }}>
+            <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+              {/* お気に入りボタン（星） */}
+              <button
+                onClick={() => onFavorite(memo.id)}
+                aria-label={memo.favorited ? 'お気に入り解除' : 'お気に入り'}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, lineHeight: 0 }}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill={memo.favorited ? '#f5a623' : 'none'} stroke={memo.favorited ? '#f5a623' : '#ccc'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
+              </button>
               <button
                 onClick={() => setIsEditing(true)}
                 style={{ fontSize: '12px', color: 'var(--text-secondary)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}

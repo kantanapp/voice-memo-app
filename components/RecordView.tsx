@@ -3,15 +3,17 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
+import { Memo } from '@/types/memo';
 import RecordButton from './RecordButton';
 import TranscriptDisplay from './TranscriptDisplay';
 import WaveformBars from './WaveformBars';
 
 interface Props {
   onSave: (text: string) => void;
+  favoriteMemos: Memo[];
 }
 
-export default function RecordView({ onSave }: Props) {
+export default function RecordView({ onSave, favoriteMemos }: Props) {
   const { finalText, interimText, isRecording, isSupported, start, stop, reset } =
     useSpeechRecognition();
   const [toast, setToast] = useState('');
@@ -78,6 +80,47 @@ export default function RecordView({ onSave }: Props) {
           </p>
         )}
       </div>
+
+      {/* お気に入りメモ（最大2件） */}
+      {favoriteMemos.length > 0 && (
+        <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <p style={{ fontSize: '11px', color: 'var(--text-muted)', letterSpacing: '0.06em', marginBottom: '2px' }}>
+            ★ お気に入り
+          </p>
+          {favoriteMemos.map((memo) => (
+            <div
+              key={memo.id}
+              style={{
+                background: 'var(--input)',
+                borderRadius: '12px',
+                padding: '12px 14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="#f5a623" stroke="#f5a623" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+              </svg>
+              <p
+                style={{
+                  fontSize: '13px',
+                  color: memo.completed ? '#bbb' : 'var(--text-primary)',
+                  textDecoration: memo.completed ? 'line-through' : 'none',
+                  lineHeight: 1.5,
+                  overflow: 'hidden',
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  margin: 0,
+                }}
+              >
+                {memo.text}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* トースト（Portal でtransform外に描画） */}
       {toast && typeof document !== 'undefined' && createPortal(
