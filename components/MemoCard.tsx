@@ -190,6 +190,12 @@ export default function MemoCard({ memo, onUpdate, onRemove, onToggle, onFavorit
                 </svg>
               </button>
               <button
+                onClick={() => onToggle(memo.id)}
+                style={{ fontSize: '12px', color: memo.completed ? '#4caf50' : 'var(--text-secondary)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+              >
+                {memo.completed ? '未完了' : '完了'}
+              </button>
+              <button
                 onClick={() => setIsEditing(true)}
                 style={{ fontSize: '12px', color: 'var(--text-secondary)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
               >
