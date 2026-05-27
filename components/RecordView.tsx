@@ -48,42 +48,9 @@ export default function RecordView({ onSave, favoriteMemos }: Props) {
         />
       </div>
 
-      {/* コントロールエリア（固定高さで安定） */}
-      <div className="flex flex-col items-center gap-4">
-        {/* 波形 */}
-        <WaveformBars isRecording={isRecording} />
-
-        {/* ステータステキスト */}
-        <p
-          style={{
-            fontSize: '13px',
-            fontWeight: isRecording ? 600 : 400,
-            color: isRecording ? '#ef4444' : 'var(--text-muted)',
-            transition: 'color 0.3s',
-            letterSpacing: isRecording ? '0.04em' : 0,
-          }}
-        >
-          {isRecording ? '● REC' : 'タップして録音'}
-        </p>
-
-        {/* 録音ボタン */}
-        <RecordButton
-          isRecording={isRecording}
-          onToggle={handleToggle}
-          disabled={!isSupported}
-        />
-
-        {/* 非対応ブラウザ通知 */}
-        {!isSupported && (
-          <p style={{ fontSize: '12px', color: 'var(--text-muted)', textAlign: 'center' }}>
-            Chrome または Edge をご利用ください
-          </p>
-        )}
-      </div>
-
-      {/* お気に入りメモ（最大2件） */}
+      {/* お気に入りメモ（最大2件）― 録音ボタンの上 */}
       {favoriteMemos.length > 0 && (
-        <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div style={{ marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <p style={{ fontSize: '11px', color: 'var(--text-muted)', letterSpacing: '0.06em', marginBottom: '2px' }}>
             ★ お気に入り
           </p>
@@ -121,6 +88,39 @@ export default function RecordView({ onSave, favoriteMemos }: Props) {
           ))}
         </div>
       )}
+
+      {/* コントロールエリア（固定高さで安定） */}
+      <div className="flex flex-col items-center gap-4">
+        {/* 波形 */}
+        <WaveformBars isRecording={isRecording} />
+
+        {/* ステータステキスト */}
+        <p
+          style={{
+            fontSize: '13px',
+            fontWeight: isRecording ? 600 : 400,
+            color: isRecording ? '#ef4444' : 'var(--text-muted)',
+            transition: 'color 0.3s',
+            letterSpacing: isRecording ? '0.04em' : 0,
+          }}
+        >
+          {isRecording ? '● REC' : 'タップして録音'}
+        </p>
+
+        {/* 録音ボタン */}
+        <RecordButton
+          isRecording={isRecording}
+          onToggle={handleToggle}
+          disabled={!isSupported}
+        />
+
+        {/* 非対応ブラウザ通知 */}
+        {!isSupported && (
+          <p style={{ fontSize: '12px', color: 'var(--text-muted)', textAlign: 'center' }}>
+            Chrome または Edge をご利用ください
+          </p>
+        )}
+      </div>
 
       {/* トースト（Portal でtransform外に描画） */}
       {toast && typeof document !== 'undefined' && createPortal(
