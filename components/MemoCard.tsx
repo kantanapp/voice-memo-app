@@ -42,15 +42,11 @@ export default function MemoCard({ memo, onUpdate, onRemove, onToggle }: Props) 
   const onTouchMove = (e: React.TouchEvent) => {
     const dx = e.touches[0].clientX - startXRef.current;
     const dy = e.touches[0].clientY - startYRef.current;
-
     if (dirRef.current === null) {
       if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
       dirRef.current = Math.abs(dx) >= Math.abs(dy) ? 'h' : 'v';
     }
     if (dirRef.current !== 'h') return;
-
-    // 右スワイプのみカードが処理（伝播を止める）
-    // 左スワイプはそのままページ切替へ伝播させる
     if (dx > 0) {
       e.stopPropagation();
       setIsSwiping(true);
@@ -61,9 +57,7 @@ export default function MemoCard({ memo, onUpdate, onRemove, onToggle }: Props) 
   const onTouchEnd = (e: React.TouchEvent) => {
     if (isSwiping) {
       e.stopPropagation();
-      if (slideX >= SWIPE_THRESHOLD) {
-        onToggle(memo.id);
-      }
+      if (slideX >= SWIPE_THRESHOLD) onToggle(memo.id);
     }
     setSlideX(0);
     setIsSwiping(false);
@@ -84,29 +78,42 @@ export default function MemoCard({ memo, onUpdate, onRemove, onToggle }: Props) 
 
   return (
     <div
-      className="relative overflow-hidden rounded-2xl"
+      className="relative overflow-hidden"
+      style={{ borderRadius: '16px', animation: 'memo-in 0.3s ease forwards' }}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
-      {/* スワイプ時に現れる背景アクション */}
+      {/* スワイプ背景アクション */}
       <div
-        className={`absolute inset-y-0 left-0 flex items-center pl-5 transition-opacity duration-150 ${
-          showHint ? 'opacity-100' : 'opacity-0'
-        }`}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          display: 'flex',
+          alignItems: 'center',
+          paddingLeft: '18px',
+          opacity: showHint ? 1 : 0,
+          transition: 'opacity 0.15s',
+        }}
       >
         <div
-          className={`w-9 h-9 rounded-full flex items-center justify-center ${
-            memo.completed ? 'bg-gray-200 dark:bg-gray-700' : 'bg-green-100'
-          }`}
+          style={{
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            background: memo.completed ? '#e8e8e8' : '#e8f5e9',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
         >
           {memo.completed ? (
-            <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2 2l8 8M10 2L2 10" stroke="#888" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
           ) : (
-            <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2 6.5l3 3 5-6" stroke="#4caf50" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           )}
         </div>
@@ -114,25 +121,30 @@ export default function MemoCard({ memo, onUpdate, onRemove, onToggle }: Props) 
 
       {/* カード本体 */}
       <div
-        className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700"
         style={{
+          background: 'var(--input)',
+          borderRadius: '16px',
+          padding: '16px 18px',
           transform: `translateX(${slideX}px)`,
           transition: isSwiping ? 'none' : 'transform 0.25s ease',
         }}
       >
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-xs text-gray-400">{formatDate(memo.createdAt)}</span>
+        {/* ヘッダー行 */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+          <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+            {formatDate(memo.createdAt)}
+          </span>
           {!isEditing && (
-            <div className="flex gap-3">
+            <div style={{ display: 'flex', gap: '16px' }}>
               <button
                 onClick={() => setIsEditing(true)}
-                className="text-xs text-indigo-500 hover:text-indigo-700 font-medium"
+                style={{ fontSize: '12px', color: 'var(--text-secondary)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
               >
                 編集
               </button>
               <button
                 onClick={() => onRemove(memo.id)}
-                className="text-xs text-red-400 hover:text-red-600 font-medium"
+                style={{ fontSize: '12px', color: '#ccc', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
               >
                 削除
               </button>
@@ -140,24 +152,46 @@ export default function MemoCard({ memo, onUpdate, onRemove, onToggle }: Props) 
           )}
         </div>
 
+        {/* 本文 */}
         {isEditing ? (
           <>
             <textarea
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
               rows={4}
-              className="w-full text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl p-3 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              style={{
+                width: '100%',
+                fontSize: '14px',
+                color: 'var(--text-primary)',
+                background: 'var(--card)',
+                border: '1px solid #e8e8e8',
+                borderRadius: '10px',
+                padding: '10px 12px',
+                resize: 'none',
+                outline: 'none',
+                fontFamily: 'inherit',
+                lineHeight: 1.6,
+              }}
             />
-            <div className="flex justify-end gap-2 mt-2">
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '8px' }}>
               <button
                 onClick={handleCancel}
-                className="text-xs text-gray-500 hover:text-gray-700 px-3 py-1.5"
+                style={{ fontSize: '13px', color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer' }}
               >
                 キャンセル
               </button>
               <button
                 onClick={handleSave}
-                className="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg font-medium"
+                style={{
+                  fontSize: '13px',
+                  color: '#fff',
+                  background: 'var(--accent)',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '6px 16px',
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                }}
               >
                 保存
               </button>
@@ -165,11 +199,13 @@ export default function MemoCard({ memo, onUpdate, onRemove, onToggle }: Props) 
           </>
         ) : (
           <p
-            className={`text-sm leading-relaxed whitespace-pre-wrap ${
-              memo.completed
-                ? 'line-through text-gray-400 dark:text-gray-500'
-                : 'text-gray-700 dark:text-gray-300'
-            }`}
+            style={{
+              fontSize: '14px',
+              lineHeight: 1.65,
+              whiteSpace: 'pre-wrap',
+              color: memo.completed ? '#bbb' : 'var(--text-primary)',
+              textDecoration: memo.completed ? 'line-through' : 'none',
+            }}
           >
             {memo.text}
           </p>

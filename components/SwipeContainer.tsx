@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import BottomNav from './BottomNav';
+import Header from './Header';
 
 const SWIPE_THRESHOLD = 60;
 
@@ -65,6 +66,7 @@ export default function SwipeContainer({ views, defaultIndex = 0 }: Props) {
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden min-h-0">
+      <Header />
       <div
         className="flex-1 overflow-hidden min-h-0"
         onTouchStart={onTouchStart}

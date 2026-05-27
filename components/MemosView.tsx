@@ -12,8 +12,7 @@ interface Props {
 
 export default function MemosView({ memos, onUpdate, onRemove, onToggle }: Props) {
   return (
-    <div className="px-4 py-6">
-      <h1 className="text-lg font-semibold mb-5">メモ一覧</h1>
+    <div style={{ padding: '4px 20px 32px' }}>
       <MemoList memos={memos} onUpdate={onUpdate} onRemove={onRemove} onToggle={onToggle} />
     </div>
   );

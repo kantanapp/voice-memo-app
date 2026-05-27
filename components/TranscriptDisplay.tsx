@@ -12,21 +12,37 @@ export default function TranscriptDisplay({
   const hasContent = finalText || interimText;
 
   return (
-    <div className="w-full min-h-40 max-h-72 overflow-y-auto rounded-2xl bg-white dark:bg-gray-800 p-5 border border-gray-200 dark:border-gray-700 shadow-sm">
+    <div
+      className="w-full min-h-40 max-h-72 overflow-y-auto"
+      style={{
+        background: 'var(--input)',
+        borderRadius: '16px',
+        padding: '16px 18px',
+      }}
+    >
       {!hasContent && !isRecording && (
-        <p className="text-gray-400 text-center text-sm leading-relaxed">
+        <p
+          className="text-center text-sm"
+          style={{ color: 'var(--text-muted)', lineHeight: 1.6 }}
+        >
           マイクボタンを押して<br />録音を開始してください
         </p>
       )}
       {!hasContent && isRecording && (
-        <p className="text-gray-400 text-center text-sm animate-pulse">
-          話してください...
+        <p
+          className="text-center text-sm"
+          style={{ color: 'var(--text-muted)', lineHeight: 1.6 }}
+        >
+          話してください…
         </p>
       )}
       {hasContent && (
-        <p className="text-gray-800 dark:text-gray-200 text-base leading-relaxed whitespace-pre-wrap">
+        <p
+          className="text-sm whitespace-pre-wrap"
+          style={{ color: 'var(--text-primary)', lineHeight: 1.7 }}
+        >
           {finalText}
-          <span className="text-gray-400">{interimText}</span>
+          <span style={{ color: '#aaa' }}>{interimText}</span>
         </p>
       )}
     </div>
