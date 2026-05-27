@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import RecordButton from './RecordButton';
 import TranscriptDisplay from './TranscriptDisplay';
@@ -55,10 +56,14 @@ export default function RecordView({ onSave }: Props) {
 
       <RecordButton isRecording={isRecording} onToggle={handleToggle} disabled={!isSupported} />
 
-      {toast && (
-        <div className="fixed top-5 left-1/2 -translate-x-1/2 bg-green-500 text-white text-sm px-5 py-2 rounded-full shadow-lg z-50">
+      {toast && typeof document !== 'undefined' && createPortal(
+        <div
+          className="fixed left-1/2 -translate-x-1/2 bg-green-500 text-white text-sm px-5 py-2 rounded-full shadow-lg z-[9999]"
+          style={{ top: 'calc(env(safe-area-inset-top, 0px) + 1.25rem)' }}
+        >
           {toast}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
