@@ -33,7 +33,7 @@ export default function RecordButton({ isRecording, onToggle, disabled }: Record
       {isRecording ? (
         /* 停止アイコン (■) */
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <rect x="3" y="3" width="12" height="12" rx="2" fill="#fff" />
+          <rect x="3" y="3" width="12" height="12" rx="2" fill="#ef4444" />
         </svg>
       ) : (
         /* マイクアイコン */
