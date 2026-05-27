@@ -18,7 +18,7 @@ export default function Page() {
   const views = useMemo(
     () => [
       <MemosView key="memos" memos={memos} onUpdate={update} onRemove={remove} onToggle={toggle} onFavorite={favorite} />,
-      <RecordView key="record" onSave={save} favoriteMemos={favoriteMemos} />,
+      <RecordView key="record" onSave={save} favoriteMemos={favoriteMemos} onUpdate={update} onRemove={remove} onToggle={toggle} onFavorite={favorite} />,
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [memos, favoriteMemos]
