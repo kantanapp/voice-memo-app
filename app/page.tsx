@@ -25,7 +25,7 @@ export default function Page() {
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden min-h-0">
-      <Header />
+      <Header memos={memos} />
       <RecordView
         onSave={save}
         memos={sortedMemos}
