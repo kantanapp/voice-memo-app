@@ -109,21 +109,12 @@ export function useMemos() {
     [memos]
   );
 
-  // お気に入りトグル（最大2件）
+  // お気に入りトグル（件数上限なし）
   const favorite = useCallback((id: string) => {
     setMemos((prev) => {
-      const target = prev.find((m) => m.id === id);
-      if (!target) return prev;
-      // 解除はいつでもOK
-      if (target.favorited) {
-        const next = prev.map((m) => m.id === id ? { ...m, favorited: false } : m);
-        persist(next);
-        return next;
-      }
-      // 追加は2件未満のときのみ
-      const favCount = prev.filter((m) => m.favorited).length;
-      if (favCount >= 2) return prev;
-      const next = prev.map((m) => m.id === id ? { ...m, favorited: true } : m);
+      const next = prev.map((m) =>
+        m.id === id ? { ...m, favorited: !m.favorited } : m
+      );
       persist(next);
       return next;
     });

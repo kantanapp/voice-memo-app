@@ -2,27 +2,38 @@
 
 import { useMemo } from 'react';
 import { useMemos } from '@/hooks/useMemos';
-import SwipeContainer from '@/components/SwipeContainer';
+import Header from '@/components/Header';
 import RecordView from '@/components/RecordView';
-import MemosView from '@/components/MemosView';
 
 export default function Page() {
   const { memos, save, update, remove, toggle, favorite } = useMemos();
 
-  const favoriteMemos = useMemo(
-    () => memos.filter((m) => m.favorited).slice(0, 2),
+  // お気に入り（上部）→ 未完了 → 完了済み、各グループ内は新しい順
+  const sortedMemos = useMemo(
+    () =>
+      [...memos].sort((a, b) => {
+        const aFav = a.favorited ? 0 : 1;
+        const bFav = b.favorited ? 0 : 1;
+        if (aFav !== bFav) return aFav - bFav;
+        const aComp = a.completed ? 1 : 0;
+        const bComp = b.completed ? 1 : 0;
+        if (aComp !== bComp) return aComp - bComp;
+        return b.createdAt - a.createdAt;
+      }),
     [memos]
   );
 
-  // views の順番 = BottomNav のタブ順: [0=メモ一覧, 1=録音]
-  const views = useMemo(
-    () => [
-      <MemosView key="memos" memos={memos} onUpdate={update} onRemove={remove} onToggle={toggle} onFavorite={favorite} />,
-      <RecordView key="record" onSave={save} favoriteMemos={favoriteMemos} onUpdate={update} onRemove={remove} onToggle={toggle} onFavorite={favorite} />,
-    ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [memos, favoriteMemos]
+  return (
+    <div className="flex-1 flex flex-col overflow-hidden min-h-0">
+      <Header />
+      <RecordView
+        onSave={save}
+        memos={sortedMemos}
+        onUpdate={update}
+        onRemove={remove}
+        onToggle={toggle}
+        onFavorite={favorite}
+      />
+    </div>
   );
-
-  return <SwipeContainer views={views} defaultIndex={1} />;
 }

@@ -11,14 +11,14 @@ import MemoCard from './MemoCard';
 
 interface Props {
   onSave: (text: string) => void;
-  favoriteMemos: Memo[];
+  memos: Memo[];
   onUpdate: (id: string, text: string) => void;
   onRemove: (id: string) => void;
   onToggle: (id: string) => void;
   onFavorite: (id: string) => void;
 }
 
-export default function RecordView({ onSave, favoriteMemos, onUpdate, onRemove, onToggle, onFavorite }: Props) {
+export default function RecordView({ onSave, memos, onUpdate, onRemove, onToggle, onFavorite }: Props) {
   const { finalText, interimText, isRecording, isSupported, start, stop, reset } =
     useSpeechRecognition();
   const [toast, setToast] = useState('');
@@ -43,9 +43,9 @@ export default function RecordView({ onSave, favoriteMemos, onUpdate, onRemove, 
   };
 
   return (
-    <div className="flex flex-col min-h-full px-5 pt-4 pb-8">
-      {/* テキストエリア */}
-      <div className="flex-1 mb-6">
+    <div className="flex flex-col flex-1 min-h-0 px-5 pt-4 pb-8">
+      {/* テキストエリア（上部固定） */}
+      <div className="shrink-0 mb-5">
         <TranscriptDisplay
           finalText={finalText}
           interimText={interimText}
@@ -53,27 +53,33 @@ export default function RecordView({ onSave, favoriteMemos, onUpdate, onRemove, 
         />
       </div>
 
-      {/* お気に入りメモ（最大2件）― 録音ボタンの上 */}
-      {favoriteMemos.length > 0 && (
-        <div style={{ marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <p style={{ fontSize: '11px', color: 'var(--text-muted)', letterSpacing: '0.06em', marginBottom: '2px' }}>
-            ★ お気に入り
+      {/* メモ一覧（中央スクロール領域）― お気に入り機能はカードの星で維持 */}
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        <p style={{ fontSize: '11px', color: 'var(--text-muted)', letterSpacing: '0.06em', marginBottom: '8px' }}>
+          メモ一覧
+        </p>
+        {memos.length === 0 ? (
+          <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '14px', padding: '32px 0' }}>
+            まだメモがありません
           </p>
-          {favoriteMemos.map((memo) => (
-            <MemoCard
-              key={memo.id}
-              memo={memo}
-              onUpdate={onUpdate}
-              onRemove={onRemove}
-              onToggle={onToggle}
-              onFavorite={onFavorite}
-            />
-          ))}
-        </div>
-      )}
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {memos.map((memo) => (
+              <MemoCard
+                key={memo.id}
+                memo={memo}
+                onUpdate={onUpdate}
+                onRemove={onRemove}
+                onToggle={onToggle}
+                onFavorite={onFavorite}
+              />
+            ))}
+          </div>
+        )}
+      </div>
 
-      {/* コントロールエリア（固定高さで安定） */}
-      <div className="flex flex-col items-center gap-4">
+      {/* コントロールエリア（下部固定） */}
+      <div className="shrink-0 flex flex-col items-center gap-4 pt-5">
         {/* 波形 */}
         <WaveformBars isRecording={isRecording} />
 
