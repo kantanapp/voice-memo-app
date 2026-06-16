@@ -9,10 +9,11 @@ type State =
   | { status: 'loading' }
   | { status: 'error'; message: string }
   | { status: 'ready'; memos: Memo[] }
-  | { status: 'done'; added: number };
+  | { status: 'done'; added: number; removed: number };
 
-// 既存メモに追記マージ（id重複はスキップ、同idは updatedAt が新しい方を採用）
-function mergeIntoLocal(incoming: Memo[]): number {
+// 追記マージ。同idは updatedAt が新しい方を採用するため、削除（deletedAt 付き）も伝播する。
+// added = 新規に追加された生メモ数、removed = 取り込みにより削除された生メモ数
+function mergeIntoLocal(incoming: Memo[]): { added: number; removed: number } {
   let existing: Memo[] = [];
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -25,18 +26,20 @@ function mergeIntoLocal(incoming: Memo[]): number {
   for (const m of existing) map.set(m.id, m);
 
   let added = 0;
+  let removed = 0;
   for (const m of incoming) {
     const cur = map.get(m.id);
     if (!cur) {
       map.set(m.id, m);
-      added++;
+      if (!m.deletedAt) added++; // 削除済みメモの取り込みは「追加」に数えない
     } else if ((m.updatedAt ?? 0) > (cur.updatedAt ?? 0)) {
-      map.set(m.id, m); // より新しい編集で更新（件数は増やさない）
+      if (!cur.deletedAt && m.deletedAt) removed++; // 生メモが削除に変わる
+      map.set(m.id, m);
     }
   }
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify([...map.values()]));
-  return added;
+  return { added, removed };
 }
 
 export default function SharePage() {
@@ -65,9 +68,12 @@ export default function SharePage() {
 
   const handleImport = () => {
     if (state.status !== 'ready') return;
-    const added = mergeIntoLocal(state.memos);
-    setState({ status: 'done', added });
+    const { added, removed } = mergeIntoLocal(state.memos);
+    setState({ status: 'done', added, removed });
   };
+
+  // 表示用は生メモ（削除済みを除く）だけ
+  const liveMemos = state.status === 'ready' ? state.memos.filter((m) => !m.deletedAt) : [];
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden min-h-0">
@@ -95,23 +101,23 @@ export default function SharePage() {
         {state.status === 'ready' && (
           <>
             <p style={{ fontSize: '14px', color: 'var(--text-primary)', marginBottom: '4px' }}>
-              {state.memos.length}件のメモを受け取りました
+              {liveMemos.length}件のメモを受け取りました
             </p>
             <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '16px' }}>
-              いまの端末のメモに<strong>追記</strong>します（既存のメモは消えません）。
+              いまの端末のメモに<strong>追記</strong>します。送信側で削除されたメモは、この端末でも削除されます。
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '24px' }}>
-              {state.memos.slice(0, 20).map((m) => (
+              {liveMemos.slice(0, 20).map((m) => (
                 <div key={m.id} style={{ background: 'var(--input)', borderRadius: '12px', padding: '12px 14px' }}>
                   <p style={{ fontSize: '13px', lineHeight: 1.6, color: 'var(--text-primary)', whiteSpace: 'pre-wrap' }}>
                     {m.text}
                   </p>
                 </div>
               ))}
-              {state.memos.length > 20 && (
+              {liveMemos.length > 20 && (
                 <p style={{ fontSize: '12px', color: 'var(--text-muted)', textAlign: 'center' }}>
-                  ほか {state.memos.length - 20} 件
+                  ほか {liveMemos.length - 20} 件
                 </p>
               )}
             </div>
@@ -126,7 +132,14 @@ export default function SharePage() {
         {state.status === 'done' && (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
             <p style={{ color: 'var(--text-primary)', fontSize: '14px', marginBottom: '8px' }}>
-              {state.added > 0 ? `${state.added}件のメモを追加しました` : '新しいメモはありませんでした（すべて取り込み済み）'}
+              {state.added === 0 && state.removed === 0
+                ? '変更はありませんでした（すべて同期済み）'
+                : [
+                    state.added > 0 ? `${state.added}件を追加` : null,
+                    state.removed > 0 ? `${state.removed}件を削除` : null,
+                  ]
+                    .filter(Boolean)
+                    .join('、') + 'しました'}
             </p>
             <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '24px' }}>
               ホームで確認できます。
