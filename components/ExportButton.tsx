@@ -55,7 +55,8 @@ export default function ExportButton({ memos }: Props) {
     if (!canExport) return showToast('出力するメモがありません');
     if (navigator.share) {
       try {
-        await navigator.share({ title: 'ボイスメモ', text });
+        // title は付けない（送信先で本文先頭の「ボイスメモ（…）」と二重表示になるため）
+        await navigator.share({ text });
         return;
       } catch {
         return; // キャンセル等は何もしない
