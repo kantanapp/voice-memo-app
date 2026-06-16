@@ -5,43 +5,19 @@ import { Memo } from '@/types/memo';
 
 export const STORAGE_KEY = 'voice-memos';
 
-const SAMPLE_MEMOS: Memo[] = [
-  {
-    id: 'sample-1',
-    text: '明日の朝、駅前のカフェで10時に打ち合わせ。資料を忘れずに持っていく。',
-    createdAt: Date.now() - 1000 * 60 * 10,
-    updatedAt: Date.now() - 1000 * 60 * 10,
-    favorited: true,
-  },
-  {
-    id: 'sample-2',
-    text: 'スーパーで買うもの：牛乳、卵、パン、野菜（キャベツ・にんじん）',
-    createdAt: Date.now() - 1000 * 60 * 60,
-    updatedAt: Date.now() - 1000 * 60 * 60,
-    completed: true,
-  },
-  {
-    id: 'sample-3',
-    text: 'Aプロジェクトのデザイン修正。フォントサイズを少し大きくして余白を調整する。レスポンシブ対応も確認。',
-    createdAt: Date.now() - 1000 * 60 * 60 * 3,
-    updatedAt: Date.now() - 1000 * 60 * 60 * 3,
-    favorited: true,
-  },
-  {
-    id: 'sample-4',
-    text: '週末に公園でピクニック。お弁当を準備しておく。',
-    createdAt: Date.now() - 1000 * 60 * 60 * 24,
-    updatedAt: Date.now() - 1000 * 60 * 60 * 24,
-  },
-];
-
 function loadMemos(): Memo[] {
   if (typeof window === 'undefined') return [];
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    // 未保存の場合はサンプルデータを表示（保存はしない）
-    if (stored === null) return SAMPLE_MEMOS;
-    return JSON.parse(stored);
+    // 未保存なら空（一覧は「まだメモがありません」を表示）。サンプルは持たない。
+    if (stored === null) return [];
+    const parsed = JSON.parse(stored);
+    if (!Array.isArray(parsed)) return [];
+    // 旧バージョンのサンプル混入バグの掃除：
+    // 本物のメモは crypto.randomUUID() 由来なので、id が 'sample-' で始まるものだけ除去する。
+    return parsed.filter(
+      (m: Memo) => !(typeof m?.id === 'string' && m.id.startsWith('sample-'))
+    );
   } catch {
     return [];
   }
