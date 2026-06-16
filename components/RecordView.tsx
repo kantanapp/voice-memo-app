@@ -19,7 +19,7 @@ interface Props {
 }
 
 export default function RecordView({ onSave, memos, onUpdate, onRemove, onToggle, onFavorite }: Props) {
-  const { finalText, interimText, isRecording, isSupported, start, stop, reset } =
+  const { finalText, interimText, isRecording, isSupported, error, start, stop, reset } =
     useSpeechRecognition();
   const [toast, setToast] = useState('');
 
@@ -105,8 +105,15 @@ export default function RecordView({ onSave, memos, onUpdate, onRemove, onToggle
 
         {/* 非対応ブラウザ通知 */}
         {!isSupported && (
-          <p style={{ fontSize: '12px', color: 'var(--text-muted)', textAlign: 'center' }}>
-            Chrome または Edge をご利用ください
+          <p style={{ fontSize: '12px', color: 'var(--text-muted)', textAlign: 'center', maxWidth: '300px' }}>
+            このブラウザは音声認識に未対応です。PCでは Chrome または Edge をご利用ください。
+          </p>
+        )}
+
+        {/* エラー表示（マイク権限・ネットワーク等の原因を提示） */}
+        {error && (
+          <p style={{ fontSize: '12px', color: '#ef4444', textAlign: 'center', maxWidth: '320px', lineHeight: 1.6 }}>
+            {error}
           </p>
         )}
       </div>
