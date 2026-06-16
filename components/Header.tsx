@@ -1,14 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Memo } from '@/types/memo';
+import ShareButton from './ShareButton';
 
-export default function Header() {
-  const [domain, setDomain] = useState('');
+interface Props {
+  memos: Memo[];
+}
 
-  useEffect(() => {
-    setDomain(window.location.hostname);
-  }, []);
-
+export default function Header({ memos }: Props) {
   return (
     <header className="flex items-center justify-between px-5 pt-5 pb-3 shrink-0">
       <span
@@ -21,11 +20,7 @@ export default function Header() {
       >
         ボイスメモ
       </span>
-      {domain && (
-        <span style={{ fontSize: '11px', color: '#bbb' }}>
-          {domain}
-        </span>
-      )}
+      <ShareButton memos={memos} />
     </header>
   );
 }

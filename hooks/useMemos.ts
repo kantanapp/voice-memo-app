@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Memo } from '@/types/memo';
 
-const STORAGE_KEY = 'voice-memos';
+export const STORAGE_KEY = 'voice-memos';
 
 const SAMPLE_MEMOS: Memo[] = [
   {
