@@ -82,9 +82,14 @@ export function useMemos() {
     });
   }, []);
 
+  // 論理削除（トゥームストーン）。配列からは消さず deletedAt を立てる。
+  // updatedAt も更新し、共有マージで「新しい方が勝つ」ことで削除が他端末へ伝播する。
   const remove = useCallback((id: string) => {
     setMemos((prev) => {
-      const next = prev.filter((m) => m.id !== id);
+      const now = Date.now();
+      const next = prev.map((m) =>
+        m.id === id ? { ...m, deletedAt: now, updatedAt: now } : m
+      );
       persist(next);
       return next;
     });

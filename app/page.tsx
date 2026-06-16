@@ -9,9 +9,12 @@ export default function Page() {
   const { memos, save, update, remove, toggle, favorite } = useMemos();
 
   // お気に入り（上部）→ 未完了 → 完了済み、各グループ内は新しい順
+  // 論理削除済み（deletedAt あり）は一覧から除外
   const sortedMemos = useMemo(
     () =>
-      [...memos].sort((a, b) => {
+      memos
+        .filter((m) => !m.deletedAt)
+        .sort((a, b) => {
         const aFav = a.favorited ? 0 : 1;
         const bFav = b.favorited ? 0 : 1;
         if (aFav !== bFav) return aFav - bFav;
